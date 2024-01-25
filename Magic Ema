@@ -1,0 +1,151 @@
+ublic License 2.0 at https://mozilla.org/MPL/2.0/
+// © Joeryru
+
+//@version=5
+indicator(title="Magic EMA", shorttitle="Magic EMA", overlay=true)
+
+get_timeframe_title(simple string tf = "") =>
+    chartTf = timeframe.isminutes == true and timeframe.multiplier > 59 ? (timeframe.multiplier/60 % 2 == 0 ? str.tostring(timeframe.multiplier/60)+"h" : str.tostring(timeframe.multiplier)+"m") : timeframe.isminutes == true ? str.tostring(timeframe.multiplier)+"m" : timeframe.period
+    result = tf == "" ? "" : request.security(syminfo.tickerid, tf, chartTf)
+
+get_mov_avg_type(type, length) => 
+    switch str.upper(type)
+        "SMA"  => ta.sma(close, length)
+        "EMA"  => ta.ema(close, length)
+
+distance = input(5, "Label Distance")
+
+ma1_enable = input.bool(true, "Enable MA 1", group = "MA Options")
+ma1_type = input.string("EMA", "MA 1 Type", options = ["SMA", "EMA"], group = "MA Options")
+ma1_timeframe = input.timeframe("", "MA 1 Timeframe", group = "MA Options")
+ma1_len = input.int(50, minval=1, title="MA 1 Length", group = "MA Options")
+ma1_out = get_mov_avg_type(ma1_type, ma1_len)
+ma1_color_input = input(color.new(#A5D6A7, 20), title="MA 1 Color", group = "MA Options") 
+ma1_color = ma1_enable ? ma1_color_input : na
+
+ma2_enable = input.bool(true, "Enable MA 2", group = "MA Options")
+ma2_type = input.string("EMA", "MA 2 Type", options = ["SMA", "EMA"], group = "MA Options")
+ma2_timeframe = input.timeframe("", "MA 2 Timeframe", group = "MA Options")
+ma2_len = input.int(100, minval=1, title="MA 2 Length", group = "MA Options")
+ma2_out = get_mov_avg_type(ma2_type, ma2_len)
+ma2_color_input = input(color.new(#F2AF29, 20), title="MA 2 Color", group = "MA Options") 
+ma2_color = ma2_enable ? ma2_color_input : na
+
+ma3_enable = input.bool(true, "Enable MA 3", group = "MA Options")
+ma3_type = input.string("SMA", "MA 3 Type", options = ["SMA", "EMA"], group = "MA Options")
+ma3_timeframe = input.timeframe("240", "MA 3 Timeframe", group = "MA Options")
+ma3_len = input.int(200, minval=1, title="MA 3 Length", group = "MA Options")
+ma3_out = get_mov_avg_type(ma3_type, ma3_len)
+ma3_color_input = input(color.new(#725AC1, 20), title="MA 3 Color", group = "MA Options") 
+ma3_color = ma3_enable ? ma3_color_input : na
+
+ma4_enable = input.bool(false, "Enable MA 4", group = "MA Options")
+ma4_type = input.string("EMA", "MA 4 Type", options = ["SMA", "EMA"], group = "MA Options")
+ma4_timeframe = input.timeframe("", "MA 4 Timeframe", group = "MA Options")
+ma4_len = input.int(100, minval=1, title="MA 4 Length", group = "MA Options")
+ma4_out = get_mov_avg_type(ma4_type, ma4_len)
+ma4_color_input = input(color.new(#FE5E41, 20), title="MA 4 Color", group = "MA Options") 
+ma4_color = ma4_enable ? ma4_color_input : na
+
+ma5_enable = input.bool(false, "Enable MA 5", group = "MA Options")
+ma5_type = input.string("EMA", "MA 5 Type", options = ["SMA", "EMA"], group = "MA Options")
+ma5_timeframe = input.timeframe("", "MA 5 Timeframe", group = "MA Options")
+ma5_len = input.int(400, minval=1, title="MA 5 Length", group = "MA Options")
+ma5_out = get_mov_avg_type(ma5_type, ma5_len)
+ma5_color_input = input(color.new(#243E36, 20), title="MA 5 Color", group = "MA Options") 
+ma5_color = ma5_enable ? ma5_color_input : na
+
+ma6_enable = input.bool(false, "Enable MA 6", group = "MA Options")
+ma6_type = input.string("EMA", "MA 6 Type", options = ["SMA", "EMA"], group = "MA Options")
+ma6_timeframe = input.timeframe("", "MA 6 Timeframe", group = "MA Options")
+ma6_len = input.int(9, minval=1, title="MA 6 Length", group = "MA Options")
+ma6_out = get_mov_avg_type(ma6_type, ma6_len)
+ma6_color_input = input(color.new(#3B3923, 20), title="MA 6 Color", group = "MA Options") 
+ma6_color = ma6_enable ? ma6_color_input : na
+
+ma7_enable = input.bool(false, "Enable MA 7", group = "MA Options")
+ma7_type = input.string("EMA", "MA 7 Type", options = ["SMA", "EMA"], group = "MA Options")
+ma7_timeframe = input.timeframe("", "MA 7 Timeframe", group = "MA Options")
+ma7_len = input.int(26, minval=1, title="MA 7 Length", group = "MA Options")
+ma7_out = get_mov_avg_type(ma7_type, ma7_len)
+ma7_color_input = input(color.new(#3A7CA5, 20), title="MA 7 Color", group = "MA Options") 
+ma7_color = ma7_enable ? ma7_color_input : na
+
+ma8_enable = input.bool(false, "Enable MA 8", group = "MA Options")
+ma8_type = input.string("EMA", "MA 8 Type", options = ["SMA", "EMA"], group = "MA Options")
+ma8_timeframe = input.timeframe("", "MA 8 Timeframe", group = "MA Options")
+ma8_len = input.int(12, minval=1, title="MA 8 Length", group = "MA Options")
+ma8_out = get_mov_avg_type(ma8_type, ma8_len)
+ma8_color_input = input(color.new(#795663, 20), title="MA 8 Color", group = "MA Options") 
+ma8_color = ma8_enable ? ma8_color_input : na
+
+
+securityNoRepaint(sym, tf, src) => request.security(sym, tf, src[barstate.isrealtime ? 1 : 0])[barstate.isrealtime ? 0 : 1]
+ma1_tf = securityNoRepaint(syminfo.tickerid, ma1_timeframe, ma1_out)
+ma2_tf = securityNoRepaint(syminfo.tickerid, ma2_timeframe, ma2_out)
+ma3_tf = securityNoRepaint(syminfo.tickerid, ma3_timeframe, ma3_out)
+ma4_tf = securityNoRepaint(syminfo.tickerid, ma4_timeframe, ma4_out)
+ma5_tf = securityNoRepaint(syminfo.tickerid, ma5_timeframe, ma5_out)
+ma6_tf = securityNoRepaint(syminfo.tickerid, ma6_timeframe, ma6_out)
+ma7_tf = securityNoRepaint(syminfo.tickerid, ma7_timeframe, ma7_out)
+ma8_tf = securityNoRepaint(syminfo.tickerid, ma8_timeframe, ma8_out)
+plot(ma1_tf, title="MA 1", color=ma1_color, linewidth=2, style=plot.style_line)
+plot(ma2_tf, title="MA 2", color=ma2_color, linewidth=2, style=plot.style_line)
+plot(ma3_tf, title="MA 3", color=ma3_color, linewidth=2, style=plot.style_line)
+plot(ma4_tf, title="MA 4", color=ma4_color, linewidth=2, style=plot.style_line)
+plot(ma5_tf, title="MA 5", color=ma5_color, linewidth=2, style=plot.style_line)
+plot(ma6_tf, title="MA 6", color=ma6_color, linewidth=2, style=plot.style_line)
+plot(ma7_tf, title="MA 7", color=ma7_color, linewidth=2, style=plot.style_line)
+plot(ma8_tf, title="MA 8", color=ma8_color, linewidth=2, style=plot.style_line)
+
+var label ma1_label = na
+var label ma2_label = na
+var label ma3_label = na
+var label ma4_label = na
+var label ma5_label = na
+var label ma6_label = na
+var label ma7_label = na
+var label ma8_label = na
+
+timeframe1_text = get_timeframe_title(ma1_timeframe)
+timeframe2_text = get_timeframe_title(ma2_timeframe)
+timeframe3_text = get_timeframe_title(ma3_timeframe)
+timeframe4_text = get_timeframe_title(ma4_timeframe)
+timeframe5_text = get_timeframe_title(ma5_timeframe)
+timeframe6_text = get_timeframe_title(ma6_timeframe)
+timeframe7_text = get_timeframe_title(ma7_timeframe)
+timeframe8_text = get_timeframe_title(ma8_timeframe)
+
+label_x = time + math.round(ta.change(time)*distance)
+
+ma1_label_txt = timeframe1_text == "" ? ma1_type + " "+str.tostring(ma1_len) : ma1_type + " "+str.tostring(ma1_len)+" ("+timeframe1_text+")"
+ma1_label := label.new(label_x, ma1_tf, text = ma1_label_txt, xloc=xloc.bar_time, color = ma1_color, textcolor = ma1_color, style = label.style_none, size=size.normal)
+label.delete(ma1_label[1])
+
+ma2_label_txt = timeframe2_text == "" ? ma2_type + " "+str.tostring(ma2_len) : ma2_type + " "+str.tostring(ma2_len)+" ("+timeframe2_text+")"
+ma2_label := label.new(label_x, ma2_tf, text = ma2_label_txt, xloc=xloc.bar_time, color = ma2_color, textcolor = ma2_color, style = label.style_none, size=size.normal)
+label.delete(ma2_label[1])
+
+ma3_label_txt = timeframe3_text == "" ? ma3_type + " "+str.tostring(ma3_len) : ma3_type + " "+str.tostring(ma3_len)+" ("+timeframe3_text+")"
+ma3_label := label.new(label_x, ma3_tf, text = ma3_label_txt, xloc=xloc.bar_time, color = ma3_color, textcolor = ma3_color, style = label.style_none, size=size.normal)
+label.delete(ma3_label[1])
+
+ma4_label_txt = timeframe4_text == "" ? ma4_type + " "+str.tostring(ma4_len) : ma4_type + " "+str.tostring(ma4_len)+" ("+timeframe4_text+")"
+ma4_label := label.new(label_x, ma4_tf, text = ma4_label_txt, xloc=xloc.bar_time, color = ma4_color, textcolor = ma4_color, style = label.style_none, size=size.normal)
+label.delete(ma4_label[1])
+
+ma5_label_txt = timeframe5_text == "" ? ma5_type + " "+str.tostring(ma5_len) : ma5_type + " "+str.tostring(ma5_len)+" ("+timeframe5_text+")"
+ma5_label := label.new(label_x, ma5_tf, text = ma5_label_txt, xloc=xloc.bar_time, color = ma5_color, textcolor = ma5_color, style = label.style_none, size=size.normal)
+label.delete(ma5_label[1])
+
+ma6_label_txt = timeframe6_text == "" ? ma6_type + " "+str.tostring(ma6_len): ma2_type + " "+str.tostring(ma6_len)+" ("+timeframe6_text+")"
+ma6_label := label.new(label_x, ma6_tf, text = ma6_label_txt, xloc=xloc.bar_time, color = ma6_color, textcolor = ma6_color, style = label.style_none, size=size.normal)
+label.delete(ma6_label[1])
+
+ma7_label_txt = timeframe7_text == "" ? ma7_type + " "+str.tostring(ma7_len) : ma7_type + " "+str.tostring(ma7_len)+" ("+timeframe7_text+")"
+ma7_label := label.new(label_x, ma7_tf, text = ma7_label_txt, xloc=xloc.bar_time, color = ma7_color, textcolor = ma7_color, style = label.style_none, size=size.normal)
+label.delete(ma7_label[1])
+
+ma8_label_txt = timeframe8_text == "" ? ma8_type + " "+str.tostring(ma8_len) : ma8_type + " "+str.tostring(ma8_len)+" ("+timeframe8_text+")"
+ma8_label := label.new(label_x, ma8_tf, text = ma8_label_txt, xloc=xloc.bar_time, color = ma8_color, textcolor = ma8_color, style = label.style_none, size=size.normal)
+label.delete(ma8_label[1])
