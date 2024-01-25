@@ -1,0 +1,1 @@
+Pine Script Magic EMA
